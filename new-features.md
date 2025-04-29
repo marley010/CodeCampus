@@ -1,4 +1,4 @@
-# User Stories en Taken voor CodeCampus Dashboard
+# User Stories voor CodeCampus Dashboard
 
 ## Must-have User Stories
 
@@ -39,16 +39,6 @@
 - Geselecteerde categorieën worden visueel gemarkeerd
 - Bij selectie worden alleen relevante cursussen getoond
 - Er is een optie om alle filters te wissen
-
-**Taken:**
-1. Verzamel alle unieke categorieën uit de cursusdata
-2. Maak een component voor categorie-filters (checkboxes of tags)
-3. Implementeer state voor geselecteerde categorieën
-4. Schrijf de filterfunctie die cursussen filtert op geselecteerde categorieën
-5. Integreer deze filtering met bestaande filters (niveau, zoeken)
-6. Voeg een "reset filters" knop toe
-7. Pas styling aan voor geselecteerde en niet-geselecteerde categorieën
-8. Test filtering met verschillende combinaties van categorieën
 
 ## Should-have User Stories
 
