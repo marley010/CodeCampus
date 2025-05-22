@@ -1,0 +1,112 @@
+.course-detail {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 24px;
+  background-color: #fefefe;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.course-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.favorite-button {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  color: #ccc;
+}
+
+.favorite-button:hover {
+  color: gold;
+}
+
+.favorite-button.favorited {
+  color: gold;
+}
+
+.detail-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.course-info {
+  flex: 1 1 60%;
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.course-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.course-button {
+  padding: 10px 18px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+}
+
+.course-button:hover {
+  background-color: #0056b3;
+}
+
+.details-sidebar {
+  flex: 1 1 30%;
+  background-color: #fafafa;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.details-sidebar h3 {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.details-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.details-sidebar li {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.details-sidebar strong {
+  color: #2c3e50;
+}

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
+import CourseDetail from './components/CourseDetail';
 import { courses } from './data/coursesData.js';
 import './styles/App.css';
 
@@ -22,22 +24,30 @@ function App() {
     setTimeout(fetchData, 1000);
   }, []);
 
+  const renderContent = () => {
+    if (isLoading) return <section className='loading'>Cursussen worden geladen...</section>;
+    if (error) return <section className='error'>{error}</section>;
+
+    return (
+      <Routes>
+        <Route path="/" element={<Dashboard courseData={courseData} />} />
+        <Route path="/courses/:id" element={<CourseDetail courseData={courseData} />} />
+      </Routes>
+    );
+  };
+
   return (
-    <main className='app'>
-      <header className='app-header'>
-        <div className='logo-container'>
-          <h1 className='brand-logo'>CodeCampus</h1>
-          <p className='brand-tagline'>Ontdek, Leer, Excelleer</p>
-        </div>
-      </header>
-      {isLoading ? (
-        <section className='loading'>Cursussen worden geladen...</section>
-      ) : error ? (
-        <section className='error'>{error}</section>
-      ) : (
-        <Dashboard courseData={courseData} />
-      )}
-    </main>
+    <Router>
+      <main className='app'>
+        <header className='app-header'>
+          <div className='logo-container'>
+            <h1 className='brand-logo'>CodeCampus</h1>
+            <p className='brand-tagline'>Ontdek, Leer, Excelleer</p>
+          </div>
+        </header>
+        {renderContent()}
+      </main>
+    </Router>
   );
 }
 

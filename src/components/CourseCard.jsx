@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import '../styles/CourseCard.css';
 
 const CourseCard = ({ course }) => {
+  const navigate = useNavigate();
+
   if (!course)
     return (
       <article className='course-card empty'>
@@ -8,14 +11,19 @@ const CourseCard = ({ course }) => {
       </article>
     );
 
-const openCourseVideo = (url) => {
-  return () => {
-    window.open(url, '_blank');
+  const openCourseVideo = (url) => {
+    return (e) => {
+      e.stopPropagation(); // voorkomt navigatie bij klikken op knop
+      window.open(url, '_blank');
+    };
   };
-};
+
+  const handleCardClick = () => {
+    navigate(`/courses/${course.id}`);
+  };
 
   return (
-    <article className='course-card'>
+    <article className='course-card' onClick={handleCardClick}>
       <figure className='course-image'>
         <img src={course.imageUrl} alt={course.title} />
       </figure>

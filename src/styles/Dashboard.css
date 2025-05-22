@@ -53,12 +53,14 @@
 }
 
 .main-content h2 {
+  display: flex;
   margin-top: 0;
   margin-bottom: 30px;
   color: var(--text-color);
   font-weight: 600;
   position: relative;
   padding-bottom: 10px;
+    text-align: center;
 }
 
 .main-content h2::after {
@@ -215,4 +217,36 @@
   .stats-container {
     grid-template-columns: 1fr;
   }
+}
+
+/*zoekbalk css*/
+.search-bar-container {
+  padding: 1rem;
+  background-color: #f9f9f9;
+   display: flex;
+  justify-content: center;
+}
+
+.search-bar {
+  width: 60%;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+.sort-container {
+  margin: 0 1rem 1rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-dropdown {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
