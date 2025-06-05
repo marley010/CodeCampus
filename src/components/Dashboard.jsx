@@ -4,38 +4,71 @@ import CourseList from './CourseList';
 import PopularCourses from './PopularCourses';
 import Statistics from './Statistics';
 
-const Dashboard = ({ courseData }) => {
-  const [activeTab, setActiveTab] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortOption, setSortOption] = useState('');
-  const [favoriteIds, setFavoriteIds] = useState([]);
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Haal favoriete IDs op uit localStorage bij laden
+const Dashboard = ({ courseData }) => {
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('activeTab') || 'all');
+  const [searchTerm, setSearchTerm] = useState(() => localStorage.getItem('searchTerm') || '');
+  const [sortOption, setSortOption] = useState(() => localStorage.getItem('sortOption') || '');
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('selectedCategories')) || [];
+    } catch {
+      return [];
+    }
+  });
+  const [navOpen, setNavOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    setFavoriteIds(storedFavorites);
+    try {
+      const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      setFavoriteIds(storedFavorites);
+    } catch (error) {
+      console.error('Fout bij het parsen van favorieten uit localStorage:', error);
+      setFavoriteIds([]);
+    }
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => localStorage.setItem('activeTab', activeTab), [activeTab]);
+  useEffect(() => localStorage.setItem('searchTerm', searchTerm), [searchTerm]);
+  useEffect(() => localStorage.setItem('sortOption', sortOption), [sortOption]);
+  useEffect(() => localStorage.setItem('selectedCategories', JSON.stringify(selectedCategories)), [selectedCategories]);
 
   const parseDurationToMinutes = (durationStr) => {
     if (!durationStr) return 0;
-
     if (durationStr.includes(':')) {
       const parts = durationStr.split(':').map(Number);
-      if (parts.length === 2) {
-        return parts[0] * 60 + parts[1];
-      }
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
     }
-
     const lower = durationStr.toLowerCase();
-    if (lower.includes('uur')) {
-      const hours = parseFloat(lower);
-      return hours * 60;
-    }
-    if (lower.includes('min')) {
-      return parseFloat(lower);
-    }
-
+    if (lower.includes('uur')) return parseFloat(lower) * 60;
+    if (lower.includes('min')) return parseFloat(lower);
     return parseFloat(durationStr) || 0;
+  };
+
+  const getAllCategories = () => {
+    const all = courseData?.flatMap(course => course.categories || []);
+    return [...new Set(all)];
+  };
+
+  const toggleCategory = (category) => {
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    localStorage.removeItem('selectedCategories');
   };
 
   const filteredCourses = () => {
@@ -50,7 +83,13 @@ const Dashboard = ({ courseData }) => {
     } else if (activeTab === 'populair') {
       filtered.sort((a, b) => b.views - a.views);
     } else if (activeTab === 'favorieten') {
-      filtered = filtered.filter(course => favoriteIds.includes(course.id.toString()));
+      filtered = filtered.filter(course => favoriteIds.includes(String(course.id)));
+    }
+
+    if (activeTab === 'filteren' && selectedCategories.length > 0) {
+      filtered = filtered.filter(course =>
+        course.categories?.some(cat => selectedCategories.includes(cat))
+      );
     }
 
     if (searchTerm.trim() !== '') {
@@ -75,15 +114,27 @@ const Dashboard = ({ courseData }) => {
     return filtered;
   };
 
+  const handleTabClick = (tabName) => {
+    setActiveTab(tabName);
+    setNavOpen(false); // Sluit menu na klik
+  };
+
   return (
-    <section className='dashboard'>
+    <section className={`dashboard ${prefersReducedMotion ? 'reduced-motion' : ''}`}>
       <header className='dashboard-header'>
-        <nav className='tab-buttons'>
-          <button className={activeTab === 'all' ? 'active' : ''} onClick={() => setActiveTab('all')}>Alle Cursussen</button>
-          <button className={activeTab === 'beginner' ? 'active' : ''} onClick={() => setActiveTab('beginner')}>Voor Beginners</button>
-          <button className={activeTab === 'gevorderd' ? 'active' : ''} onClick={() => setActiveTab('gevorderd')}>Gevorderd</button>
-          <button className={activeTab === 'populair' ? 'active' : ''} onClick={() => setActiveTab('populair')}>Meest Bekeken</button>
-          <button className={activeTab === 'favorieten' ? 'active' : ''} onClick={() => setActiveTab('favorieten')}>⭐ Favorieten</button>
+        <button
+          className='mobile-nav-toggle'
+          onClick={() => setNavOpen(!navOpen)}
+        >
+          {navOpen ? '✖ Sluiten' : '☰ Menu'}
+        </button>
+        <nav className={`tab-buttons ${navOpen ? 'open' : ''}`}>
+          <button className={activeTab === 'all' ? 'active' : ''} onClick={() => handleTabClick('all')}>Alle Cursussen</button>
+          <button className={activeTab === 'beginner' ? 'active' : ''} onClick={() => handleTabClick('beginner')}>Voor Beginners</button>
+          <button className={activeTab === 'gevorderd' ? 'active' : ''} onClick={() => handleTabClick('gevorderd')}>Gevorderd</button>
+          <button className={activeTab === 'populair' ? 'active' : ''} onClick={() => handleTabClick('populair')}>Meest Bekeken</button>
+          <button className={activeTab === 'favorieten' ? 'active' : ''} onClick={() => handleTabClick('favorieten')}>⭐ Favorieten</button>
+          <button className={activeTab === 'filteren' ? 'active' : ''} onClick={() => handleTabClick('filteren')}>Meer Filter</button>
         </nav>
       </header>
 
@@ -112,26 +163,47 @@ const Dashboard = ({ courseData }) => {
         </select>
       </div>
 
-      <div className='dashboard-content'>
-        <section className='main-content'>
-          <h2>
-            {activeTab === 'all'
-              ? 'Alle Cursussen'
-              : activeTab === 'beginner'
-              ? 'Cursussen voor Beginners'
-              : activeTab === 'gevorderd'
-              ? 'Gevorderde Cursussen'
-              : activeTab === 'favorieten'
-              ? 'Mijn Favorieten'
-              : 'Meest Bekeken Cursussen'}
-          </h2>
-          <CourseList courses={filteredCourses()} />
-        </section>
+      {activeTab === 'filteren' && (
+        <div className='category-filter'>
+          <h3>Categorieën</h3>
+          <div className='category-buttons'>
+            {getAllCategories().map((category) => (
+              <button
+                key={category}
+                className={selectedCategories.includes(category) ? 'category selected' : 'category'}
+                onClick={() => toggleCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+            <button onClick={clearFilters} className='clear-filters'>Wissen</button>
+          </div>
+        </div>
+      )}
 
-        <aside className='sidebar'>
-          <PopularCourses courses={courseData} />
-          <Statistics courses={courseData} />
-        </aside>
+      <div className='dashboard-content fade-in'>
+        {isLoading ? (
+          <div className='loading-spinner'>Laden...</div>
+        ) : (
+          <>
+            <section className='main-content'>
+              <h2>
+                {activeTab === 'all' && 'Alle Cursussen'}
+                {activeTab === 'beginner' && 'Cursussen voor Beginners'}
+                {activeTab === 'gevorderd' && 'Gevorderde Cursussen'}
+                {activeTab === 'populair' && 'Meest Bekeken Cursussen'}
+                {activeTab === 'favorieten' && 'Mijn Favorieten'}
+                {activeTab === 'filteren' && 'Meer Filter Keuze'}
+              </h2>
+              <CourseList courses={filteredCourses()} />
+            </section>
+
+            <aside className='sidebar'>
+              <PopularCourses courses={courseData} />
+              <Statistics courses={courseData} />
+            </aside>
+          </>
+        )}
       </div>
     </section>
   );

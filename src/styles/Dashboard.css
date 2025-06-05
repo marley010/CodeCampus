@@ -250,3 +250,108 @@
   border: 1px solid #ccc;
   border-radius: 6px;
 }
+
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.category {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  background: #f4f4f4;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.category.selected {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.clear-filters {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-left: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+/* Voor fade-in animatie */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in forwards;
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Laad spinner */
+.loading-spinner {
+  animation: pulse 1s infinite ease-in-out;
+  text-align: center;
+  font-weight: bold;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Hover-effecten */
+.tab-buttons button:hover,
+.category-buttons .category:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Hamburger menu styling voor mobiel */
+@media (max-width: 768px) {
+  .tab-buttons {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .tab-buttons.open {
+    display: flex;
+  }
+
+  .mobile-nav-toggle {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+  }
+}
+
+/* Zorg dat de hamburgerknop op desktop verborgen blijft */
+@media (min-width: 769px) {
+  .mobile-nav-toggle {
+    display: none;
+  }
+
+  .tab-buttons {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+  }
+}
