@@ -163,3 +163,64 @@
     height: 160px;
   }
 }
+
+.course-card {
+  border: 2px solid #ddd;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+}
+
+.course-card.viewed {
+  border-color: #28a745;
+  background-color: #f0fff4;
+}
+
+.course-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.course-actions button {
+  width: 140px; /* vaste breedte voor alle buttons */
+  padding: 0.5rem 0.75rem; /* iets meer horizontale padding voor mooiere proporties */
+  text-align: center;
+  font-size: 1rem;
+  box-sizing: border-box;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+
+.course-actions button:hover {
+  background-color: #0056b3;
+}
+
+.dark-mode .course-details,
+.dark-mode .course-details * {
+  color: black !important;
+}
+
+.viewed-button{
+  padding: 10px 18px !important;
+  background-color: #007bff !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 0.95rem !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.viewed-button:hover{
+    background-color: var(--primary-dark) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 10px rgba(52, 152, 219, 0.2) !important;
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 import CourseList from './CourseList';
 import PopularCourses from './PopularCourses';
@@ -11,6 +12,13 @@ const Dashboard = ({ courseData }) => {
   const [searchTerm, setSearchTerm] = useState(() => localStorage.getItem('searchTerm') || '');
   const [sortOption, setSortOption] = useState(() => localStorage.getItem('sortOption') || '');
   const [favoriteIds, setFavoriteIds] = useState([]);
+  const [viewedCourseIds, setViewedCourseIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('viewedCourses')) || [];
+    } catch {
+      return [];
+    }
+  });
   const [selectedCategories, setSelectedCategories] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('selectedCategories')) || [];
@@ -20,6 +28,11 @@ const Dashboard = ({ courseData }) => {
   });
   const [navOpen, setNavOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 🌙 Dark mode state
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
 
   useEffect(() => {
     try {
@@ -40,6 +53,8 @@ const Dashboard = ({ courseData }) => {
   useEffect(() => localStorage.setItem('searchTerm', searchTerm), [searchTerm]);
   useEffect(() => localStorage.setItem('sortOption', sortOption), [sortOption]);
   useEffect(() => localStorage.setItem('selectedCategories', JSON.stringify(selectedCategories)), [selectedCategories]);
+  useEffect(() => localStorage.setItem('viewedCourses', JSON.stringify(viewedCourseIds)), [viewedCourseIds]);
+  useEffect(() => localStorage.setItem('darkMode', darkMode), [darkMode]); // 🌙 Save dark mode
 
   const parseDurationToMinutes = (durationStr) => {
     if (!durationStr) return 0;
@@ -66,6 +81,14 @@ const Dashboard = ({ courseData }) => {
     );
   };
 
+  const toggleViewed = (courseId) => {
+    setViewedCourseIds(prev =>
+      prev.includes(courseId)
+        ? prev.filter(id => id !== courseId)
+        : [...prev, courseId]
+    );
+  };
+
   const clearFilters = () => {
     setSelectedCategories([]);
     localStorage.removeItem('selectedCategories');
@@ -84,6 +107,10 @@ const Dashboard = ({ courseData }) => {
       filtered.sort((a, b) => b.views - a.views);
     } else if (activeTab === 'favorieten') {
       filtered = filtered.filter(course => favoriteIds.includes(String(course.id)));
+    } else if (activeTab === 'bekeken') {
+      filtered = filtered.filter(course => viewedCourseIds.includes(course.id));
+    } else if (activeTab === 'onbekeken') {
+      filtered = filtered.filter(course => !viewedCourseIds.includes(course.id));
     }
 
     if (activeTab === 'filteren' && selectedCategories.length > 0) {
@@ -116,11 +143,11 @@ const Dashboard = ({ courseData }) => {
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
-    setNavOpen(false); // Sluit menu na klik
+    setNavOpen(false);
   };
 
   return (
-    <section className={`dashboard ${prefersReducedMotion ? 'reduced-motion' : ''}`}>
+    <section className={`dashboard ${darkMode ? 'dark-mode' : ''} ${prefersReducedMotion ? 'reduced-motion' : ''}`}>
       <header className='dashboard-header'>
         <button
           className='mobile-nav-toggle'
@@ -128,12 +155,22 @@ const Dashboard = ({ courseData }) => {
         >
           {navOpen ? '✖ Sluiten' : '☰ Menu'}
         </button>
+
+        <button
+          className='dark-mode-toggle'
+          onClick={() => setDarkMode(prev => !prev)}
+        >
+          {darkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
+        </button>
+
         <nav className={`tab-buttons ${navOpen ? 'open' : ''}`}>
           <button className={activeTab === 'all' ? 'active' : ''} onClick={() => handleTabClick('all')}>Alle Cursussen</button>
           <button className={activeTab === 'beginner' ? 'active' : ''} onClick={() => handleTabClick('beginner')}>Voor Beginners</button>
           <button className={activeTab === 'gevorderd' ? 'active' : ''} onClick={() => handleTabClick('gevorderd')}>Gevorderd</button>
           <button className={activeTab === 'populair' ? 'active' : ''} onClick={() => handleTabClick('populair')}>Meest Bekeken</button>
           <button className={activeTab === 'favorieten' ? 'active' : ''} onClick={() => handleTabClick('favorieten')}>⭐ Favorieten</button>
+          <button className={activeTab === 'bekeken' ? 'active' : ''} onClick={() => handleTabClick('bekeken')}>👁️ Bekeken</button>
+          <button className={activeTab === 'onbekeken' ? 'active' : ''} onClick={() => handleTabClick('onbekeken')}>🙈 Onbekeken</button>
           <button className={activeTab === 'filteren' ? 'active' : ''} onClick={() => handleTabClick('filteren')}>Meer Filter</button>
         </nav>
       </header>
@@ -194,8 +231,14 @@ const Dashboard = ({ courseData }) => {
                 {activeTab === 'populair' && 'Meest Bekeken Cursussen'}
                 {activeTab === 'favorieten' && 'Mijn Favorieten'}
                 {activeTab === 'filteren' && 'Meer Filter Keuze'}
+                {activeTab === 'bekeken' && 'Bekeken Cursussen'}
+                {activeTab === 'onbekeken' && 'Onbekeken Cursussen'}
               </h2>
-              <CourseList courses={filteredCourses()} />
+              <CourseList
+                courses={filteredCourses()}
+                viewedCourseIds={viewedCourseIds}
+                onToggleViewed={toggleViewed}
+              />
             </section>
 
             <aside className='sidebar'>

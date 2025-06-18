@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import '../styles/CourseCard.css';
 
-const CourseCard = ({ course }) => {
+const CourseCard = ({ course, isViewed, onToggleViewed }) => {
   const navigate = useNavigate();
 
   if (!course)
@@ -23,7 +23,10 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <article className='course-card' onClick={handleCardClick}>
+    <article
+      className={`course-card ${isViewed ? 'viewed' : ''}`}
+      onClick={handleCardClick}
+    >
       <figure className='course-image'>
         <img src={course.imageUrl} alt={course.title} />
       </figure>
@@ -51,6 +54,15 @@ const CourseCard = ({ course }) => {
             onClick={openCourseVideo(course.videoUrl)}
           >
             Bekijk Video
+          </button>
+          <button
+            className='viewed-button'
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleViewed(course.id);
+            }}
+          >
+            {isViewed ? 'Bekeken ✔' : 'Markeer als bekeken'}
           </button>
         </div>
       </div>
